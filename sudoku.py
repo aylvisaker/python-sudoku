@@ -87,28 +87,32 @@ def main():
 if __name__ == '__main__':
     main()
 
-## BENCHMARKS
+# BENCHMARKS
 
-## boards0.txt
-## Solved 76 puzzles in 0.34359 seconds.
-## Averaging 221.1938647806979 puzzles per second.
+# boards0.txt
+# Solved 76 puzzles in 0.34359 seconds.
+# Averaging 221.1938647806979 puzzles per second.
 
-## boards1.txt
-## Solved 5000 puzzles in 55.533641 seconds.
-## Averaging 90.03551558955049 puzzles per second.
+# boards1.txt
+# Solved 5000 puzzles in 55.533641 seconds.
+# Averaging 90.03551558955049 puzzles per second.
 
-## boards2.txt
-## Solved 5000 puzzles in 55.947404 seconds.
-## Averaging 89.36965153914916 puzzles per second.
+# boards2.txt
+# Solved 5000 puzzles in 55.947404 seconds.
+# Averaging 89.36965153914916 puzzles per second.
 
-## boards3.txt
-## Solved 17 puzzles in 0.06851099999999999 seconds.
-## Averaging 248.1353359314563 puzzles per second.
+# boards3.txt
+# Solved 17 puzzles in 0.06851099999999999 seconds.
+# Averaging 248.1353359314563 puzzles per second.
 
-## boards4.txt
+# boards4.txt
+# Solved 500 puzzles in 825.438726 seconds.
+# Averaging 0.605738480944496 puzzles per second.
 
-## boards5.txt
+# boards5.txt
+# Solved 95 puzzles in 67.745096 seconds.
+# Averaging 1.4023155270161547 puzzles per second.
 
-## boards6.txt
-## Solved 11 puzzles in 0.12351100000000001 seconds.
-## Averaging 89.06089336172487 puzzles per second.
+# boards6.txt
+# Solved 11 puzzles in 0.12351100000000001 seconds.
+# Averaging 89.06089336172487 puzzles per second.
