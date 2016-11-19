@@ -1,7 +1,6 @@
 import time
-import random
 import sys
-
+# import random
 
 def cross(x, y):
     return [a + b for a in x for b in y]
@@ -32,14 +31,17 @@ def eliminate(b, s, n):
     b[s] = b[s].replace(n, '')
     if len(b[s]) == 0:
         return False
-    elif len(b[s]) == 1:
+    # Naked singles
+    if len(b[s]) == 1:
         if not all(eliminate(b, r, b[s]) for r in neighbors[s]):
             return False
     for nbhd in neighborhoods[s]:
         locations = [sq for sq in nbhd if n in b[sq]]
+        # No n's remaining in this neighborhood
         if len(locations) == 0:
             return False
-        elif len(locations) == 1:
+        # Hidden singles
+        if len(locations) == 1:
             if not fillin(b, locations[0], n):
                 return False
     return b
@@ -68,16 +70,21 @@ def solve(b):
 def display(b):
     if b is False:
         return False
-    line = ''.join(b[s] for s in squares)
+    line = ''
+    for s in squares:
+        x = b[s]
+        if len(x) == 1:
+            line += x
+        else:
+            line += specials[0]
     return(line)
 
 
 def main():
-    filenames = ['easy50.txt', 'top95.txt', 'hardest.txt']
-    if len(sys.argv) > 2:
-        filenames += ['boards0.txt', 'boards1.txt', 'boards2.txt']
-        filenames += ['boards5000.1.txt', 'boards5000.2.txt']
-        filenames += ['sudoku17', 'sudoku17-ml']
+    filenames = ['singlesonly.txt']
+    # filenames = ['easy50.txt', 'top95.txt', 'hardest.txt']
+    # filenames += ['boards0.txt', 'boards1.txt', 'boards2.txt', 'boards5000.1.txt', 'boards5000.2.txt']
+    # filenames += ['sudoku17', 'sudoku17-ml']
     if len(sys.argv) == 2:
         filenames = [sys.argv[1]]
     for name in filenames:
@@ -87,11 +94,13 @@ def main():
         t = time.clock()
         for p in puzzles:
             q = solve(initialize_board(p))
-            # print(p + '\n' + display(q))
+            # q = initialize_board(p)
+            # if q == solve(q):
+            #     print(p)
         t = time.clock() - t
+        avg = len(puzzles) / t
         print('# ' + name)
         print('# Solved ' + str(len(puzzles)) + ' puzzles in ' + str(t) + ' seconds.')
-        avg = len(puzzles) / t
         print('# Averaging ' + str(avg) + ' puzzles per second.\n')
 
 if __name__ == '__main__':
