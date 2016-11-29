@@ -84,9 +84,9 @@ def display(b):
 
 
 def main():
-    file_names = ['puzzles/singlesonly.txt']
-    if len(sys.argv) == 2:
-        file_names = [sys.argv[1]]
+    file_names = ['puzzles/boards5000.1.txt']
+    if len(sys.argv) > 1:
+        file_names = [sys.argv[1:]]
     for name in file_names:
         file = open(name, 'r')
         puzzles = file.readlines()
