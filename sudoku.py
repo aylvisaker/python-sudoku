@@ -2,6 +2,9 @@ import time
 import sys
 # import random
 
+# Tools and Constants
+
+
 def cross(x, y):
     return [a + b for a in x for b in y]
 
@@ -37,7 +40,7 @@ def eliminate(b, s, n):
             return False
     for nbhd in neighborhoods[s]:
         locations = [sq for sq in nbhd if n in b[sq]]
-        # No n's remaining in this neighborhood
+        # Nowhere to put 'n' in this neighborhood
         if len(locations) == 0:
             return False
         # Hidden singles
@@ -81,13 +84,10 @@ def display(b):
 
 
 def main():
-    filenames = ['singlesonly.txt']
-    # filenames = ['easy50.txt', 'top95.txt', 'hardest.txt']
-    # filenames += ['boards0.txt', 'boards1.txt', 'boards2.txt', 'boards5000.1.txt', 'boards5000.2.txt']
-    # filenames += ['sudoku17', 'sudoku17-ml']
+    file_names = ['puzzles/singlesonly.txt']
     if len(sys.argv) == 2:
-        filenames = [sys.argv[1]]
-    for name in filenames:
+        file_names = [sys.argv[1]]
+    for name in file_names:
         file = open(name, 'r')
         puzzles = file.readlines()
         puzzles = [p[:81] for p in puzzles if len(p) >= 81]

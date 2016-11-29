@@ -19,6 +19,8 @@ import sudoku
 #       failed 2048 puzzles with [0,1,6,2,3,4,5]
 #       failed 2048 puzzles with [0,1,2,6,3,4,5]
 
+# <editor-fold desc = "Miscellaneous tools and constants">
+
 def cross(x, y):
     return [a + b for a in x for b in y]
 
@@ -54,19 +56,25 @@ values = dict((v, list({s & v for s in singles} - {0})) for v in range(2**9))
 valuesets = dict((v, {s & v for s in singles} - {0}) for v in range(2**9))
 
 methodnames = ['naked singles', 'naked doubles', 'hidden singles', 'hidden doubles', 'hidden triples',
-               'hidden quadruples', 'intersectionremoval', 'x-wing', 'clue']
+               'hidden quadruples', 'intersectionremoval', 'x-wing', 'given clue']
 methodcounter = [0 for dummy in methodnames]
+# </editor-fold>
 
 def initialize(v):
+    """
+    :param v: String representation of a sudoku board.
+    :return: Dictionary representation of a sudoku board.
+    """
     global methodcounter
     global method
-    # methodcounter = [0 for dummy in methodnames]
+    # methodcounter = [0 for dummy in methodnames]  # keep track of methods per puzzle
     b = {s: 511 for s in squares}
     for s in squares:
         if v[s] in digits:
             method = 8
             fillin(b, s, 2 ** (int(v[s]) - 1))
     return b
+
 
 def eliminate(b, s, n):
     global methodcounter
@@ -198,7 +206,11 @@ def eliminate(b, s, n):
 
     return b
 
+
 def fillin(b, s, n):
+    """
+    Fills in square 's' by elminating all candidates except 'n'.
+    """
     global methodcounter
     global method
     candidates = b[s]
@@ -207,7 +219,11 @@ def fillin(b, s, n):
         eliminate(b, s, e)
     return b
 
+
 def display(b):
+    """
+    Returns a string representation of the board in a single line. Blanks are filled with '+'.
+    """
     def f(s):
         if b[s] in singles:
             return str(int(math.log(b[s], 2) + 1))
@@ -215,9 +231,10 @@ def display(b):
             return '+'
     return ''.join([f(s) for s in squares])
 
+
 def main():
     global methodcounter
-    filenames = ['easy50.txt']
+    filenames = ['singlesonly.txt']
     if len(sys.argv) == 2:
         filenames = [sys.argv[1]]
     for name in filenames:
