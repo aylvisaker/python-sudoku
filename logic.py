@@ -12,6 +12,8 @@ import sudoku
 # TODO try to minimize unnecessary calls to eliminate
 # TODO make functions for each separate technique
 # TODO add lots of comments
+# TODO naked tuples, x-wing
+# TODO rewrite all of this - bit operations aren't helping much
 # TODO strange behavior note: in boards5000.1.txt
 #       failed 2050 puzzles with [0,1,2,3,4,5,6]
 #       failed 2048 puzzles with [0,1,6,2,3,4,5]
@@ -52,47 +54,50 @@ values = dict((v, list({s & v for s in singles} - {0})) for v in range(2**9))
 valuesets = dict((v, {s & v for s in singles} - {0}) for v in range(2**9))
 
 methodnames = ['naked singles', 'naked doubles', 'hidden singles', 'hidden doubles', 'hidden triples',
-               'hidden quadruples', 'intersectionremoval']
+               'hidden quadruples', 'intersectionremoval', 'x-wing', 'clue']
 methodcounter = [0 for dummy in methodnames]
 
 def initialize(v):
     global methodcounter
+    global method
     # methodcounter = [0 for dummy in methodnames]
     b = {s: 511 for s in squares}
     for s in squares:
         if v[s] in digits:
+            method = 8
             fillin(b, s, 2 ** (int(v[s]) - 1))
     return b
 
 def eliminate(b, s, n):
     global methodcounter
+    global method
     complement = 511 - n
     candidates = b[s]
     newcandidates = complement & candidates
     if not candidates == newcandidates:
         # update s
+        methodcounter[method] += 1
         b[s] = newcandidates
-        size = gmpy2.popcount(x)
+        # size = gmpy2.popcount(x)
         # 0. check for naked singles
         if newcandidates in singles:
-            method = 0
             for square in neighbors[s]:
-                methodcounter[method] += 1
+                method = 0
                 eliminate(b, square, newcandidates)
         # 1. check for naked doubles
         if newcandidates in tuples[2]:
-            method = 1
             for square in neighbors[s]:
                 if b[square] == newcandidates:
                     nghbrs = setneighbors[s] & setneighbors[square]
                     for i in range(len(nghbrs)):
                         nghbr = nghbrs.pop()
                         for v in values[newcandidates]:
-                            methodcounter[method] += 1
+                            method = 1
                             eliminate(b, nghbr, v)
-        # 7. check for naked triples
+        # 7. check for naked triples NOT DONE
         if newcandidates in tuples[2] or newcandidates in tuples[3]:
-            method = 7
+            dummy = 1
+            dummy = 2
         # check for hidden tuples
         for nbhd in neighborhoods[s]:
             locations = {sqr for sqr in nbhd if not (n & b[sqr] == 0)}
@@ -100,11 +105,9 @@ def eliminate(b, s, n):
             # 2. hidden singles
             if len(locations) == 1:
                 method = 2
-                methodcounter[method] += 1
                 fillin(b, locations.pop(), n)
             # 6. intersection removal
             if len(locations) in [2, 3]:
-                method = 6
                 rw = {coordinates[x][0] for x in locationslist}
                 cl = {coordinates[x][1] for x in locationslist}
                 bx = {coordinates[x][2] for x in locationslist}
@@ -114,11 +117,10 @@ def eliminate(b, s, n):
                         common_nghbrs &= setneighbors[x]
                     while common_nghbrs:
                         x = common_nghbrs.pop()
-                        methodcounter[method] += 1
+                        method = 6
                         eliminate(b, x, n)
             # 3. hidden doubles
             if len(locations) == 2:
-                method = 3
                 x, y = list(locations)
                 xvals, yvals = valuesets[x], valuesets[y]
                 common = (xvals & yvals) - {n}
@@ -137,11 +139,10 @@ def eliminate(b, s, n):
                             while union:
                                 s = union.pop()
                                 for sqr in [x, y]:
-                                    methodcounter[method] += 1
+                                    method = 3
                                     eliminate(b, sqr, s)
             # 4. hidden triples
             if len(locations) == 3:
-                method = 4
                 x, y , z = list(locations)
                 xvals, yvals, zvals = valuesets[x], valuesets[y], valuesets[z]
                 common = (xvals & yvals & zvals) - {n}
@@ -160,11 +161,10 @@ def eliminate(b, s, n):
                                 while union:
                                     s = union.pop()
                                     for sqr in [x, y, z]:
-                                        methodcounter[method] += 1
+                                        method = 4
                                         eliminate(b, sqr, s)
             # 5. hidden quadruples
             if len(locations) == 4:
-                method = 5
                 w, x, y, z = list(locations)
                 wvals, xvals, yvals, zvals = valuesets[w], valuesets[x], valuesets[y], valuesets[z]
                 common = (wvals & xvals & yvals & zvals) - {n}
@@ -187,12 +187,20 @@ def eliminate(b, s, n):
                                     while union:
                                         s = union.pop()
                                         for sqr in [x, y, z]:
-                                            methodcounter[method] += 1
+                                            method = 5
                                             eliminate(b, sqr, s)
+            # 8. x-wing NOT DONE
+            if len(locations) == 2:
+                rw = {coordinates[x][0] for x in locationslist}
+                cl = {coordinates[x][1] for x in locationslist}
+                bx = {coordinates[x][2] for x in locationslist}
+
+
     return b
 
 def fillin(b, s, n):
     global methodcounter
+    global method
     candidates = b[s]
     needseliminated = [x for x in singles if candidates & n == n and not x == n]
     for e in needseliminated:
@@ -209,7 +217,7 @@ def display(b):
 
 def main():
     global methodcounter
-    filenames = ['boards5000.1.txt']
+    filenames = ['easy50.txt']
     if len(sys.argv) == 2:
         filenames = [sys.argv[1]]
     for name in filenames:
@@ -233,7 +241,9 @@ def main():
         print('# Failed to solve ' + str(c) + ' puzzles. Witnessed ' + str(e) + ' errors.')
         print('# Worked ' + str(n) + ' puzzles in ' + str(t) + ' seconds.')
         print('# Averaging ' + str(avg) + ' puzzles per second.\n')
-        print(methodcounter)
-
+        for number, name, count in zip(range(len(methodnames)), methodnames, methodcounter):
+            print(number, name, count)
+        print(sum(methodcounter))
+        print(8*81*len(puzzles))
 if __name__ == '__main__':
     main()
