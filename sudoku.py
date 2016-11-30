@@ -1,16 +1,16 @@
 import time
 import sys
-# import random
+import random
+import string
 
-# Tools and Constants
-
-
+# TODO : Make this dynamic. Choose characters and base after reading puzzle.
 def cross(x, y):
     return [a + b for a in x for b in y]
-
-specials = '.+0'
-digits = '123456789'
-blocks = ['123', '456', '789']
+# Standard sudoku has base = 3. This code can handle up to base = 7. (More with minor modifications.)
+base = 4
+specials = string.punctuation #+ '0 '
+digits = (string.digits + string.ascii_uppercase + string.ascii_lowercase)[0:0 + base ** 2]
+blocks = [digits[base*i:base*(i+1)] for i in range(base)]
 squares = cross(digits, digits)
 the_rows = [cross(x, digits) for x in digits]
 the_columns = [cross(digits, x) for x in digits]
@@ -84,19 +84,16 @@ def display(b):
 
 
 def main():
-    file_names = ['puzzles/boards5000.1.txt']
+    file_names = ['puzzles/unsolvable.txt']
     if len(sys.argv) > 1:
         file_names = [sys.argv[1:]]
     for name in file_names:
         file = open(name, 'r')
         puzzles = file.readlines()
-        puzzles = [p[:81] for p in puzzles if len(p) >= 81]
+        puzzles = [p[:base ** 4] for p in puzzles if len(p) >= base ** 4][:500]
         t = time.clock()
         for p in puzzles:
             q = solve(initialize_board(p))
-            # q = initialize_board(p)
-            # if q == solve(q):
-            #     print(p)
         t = time.clock() - t
         avg = len(puzzles) / t
         print('# ' + name)
