@@ -7,9 +7,9 @@ import string
 def cross(x, y):
     return [a + b for a in x for b in y]
 # Standard sudoku has base = 3. This code can handle up to base = 7. (More with minor modifications.)
-base = 4
-specials = string.punctuation #+ '0 '
-digits = (string.digits + string.ascii_uppercase + string.ascii_lowercase)[0:0 + base ** 2]
+base = 3
+specials = string.punctuation + ' '
+digits = (string.digits + string.ascii_uppercase + string.ascii_lowercase)[1:1 + base ** 2]
 blocks = [digits[base*i:base*(i+1)] for i in range(base)]
 squares = cross(digits, digits)
 the_rows = [cross(x, digits) for x in digits]
@@ -90,7 +90,7 @@ def main():
     for name in file_names:
         file = open(name, 'r')
         puzzles = file.readlines()
-        puzzles = [p[:base ** 4] for p in puzzles if len(p) >= base ** 4][:500]
+        puzzles = [p[:base ** 4] for p in puzzles if len(p) >= base ** 4]
         t = time.clock()
         for p in puzzles:
             q = solve(initialize_board(p))
